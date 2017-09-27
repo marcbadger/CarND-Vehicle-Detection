@@ -14,7 +14,7 @@ The goals / steps of this project were to:
 
 [//]: # (Image References)
 
-[YCrCb_channels]: ./examples/YCrCb_channels.png " "
+[YCrCb_channels]: ./examples/YCrCb_channels.png " ""
 [HLS_channels]: ./examples/HLS_channels.png " "
 [RGB_channels]: ./examples/RGB_channels.png " "
 [num_orientations_2_4_8_12]: ./examples/num_orientations_2_4_8_12.png " "
@@ -38,13 +38,15 @@ The goals / steps of this project were to:
 ### Writeup / README
 
 #### 1. My project includes the following files:
-* [camera_calibration.py](https://github.com/marcbadger/CarND-Advanced-Lane-Lines/blob/master/code/camera_calibration.py) - a Python script to generate camera matrix and distortion coefficients from checkerboard images
-* [image_gen.py](https://github.com/marcbadger/CarND-Advanced-Lane-Lines/blob/master/code/image_gen.py) - a Python script to run the tracking pipeline on sample images
-* [video_gen.py](https://github.com/marcbadger/CarND-Advanced-Lane-Lines/blob/master/code/video_gen.py) - a Python script to run the tracking pipeline on sample videos
-* [tracker_vid.py](https://github.com/marcbadger/CarND-Advanced-Lane-Lines/blob/master/code/tracker_vid.py) - a Python class that handles lane finding and fitting
-* [project_video_tracked.mp4](https://github.com/marcbadger/CarND-Advanced-Lane-Lines/blob/master/code/project_video_tracked.mp4) - the output of the lane finding pipeline on the sample video.
-* [example output images](https://github.com/marcbadger/CarND-Advanced-Lane-Lines/tree/master/output_images) - intermediate output of image_gen.py
-* [README.md, this document](https://github.com/marcbadger/CarND-Advanced-Lane-Lines/blob/master/README.md) - a writeup report summarizing the results
+* [extract_features.py](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/code/extract_features.py) - a Python script to generate and save features (HOG, spatial, histogram) from training images.
+* [train_SVC.py](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/code/train_SVC.py) - a Python script that loads in pre-extracted features and trains a linear support vector machine (using `sklearn.svm.LinearSVC).
+* [hog_subsampling_w_heatmap.py](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/code/hog_subsampling_w_heatmap.py) - a Python script to run the vehicle detection pipeline on a list of images, generates intermediate output.
+* [track_video.py](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/code/track_video.py) - a Python script to run the tracking pipeline on sample videos
+* [vehicles.py](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/code/vehicles.py) - a Python class that handles assigning detections to car tracks
+* [lesson_functions.py](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/code/lesson_functions.py) - a Python script containing useful functions that were shown in the lesson.  Note this contains the important functions `get_hog_features()` and `extract_features()`!
+* [project_video_tracked.mp4](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/code/project_video_tracked.mp4) - the output of the vehicle detection pipeline on the sample video.
+* [example output images](https://github.com/marcbadger/CarND-Vehicle-Detection/tree/master/output_images) - intermediate output of hog_subsampling_w_heatmap.py
+* [README.md, this document](https://github.com/marcbadger/CarND-Vehicle-Detection/blob/master/README.md) - a writeup report summarizing the results
 
 ### Histogram of Oriented Gradients (HOG)
 
@@ -173,7 +175,9 @@ And here are the tracks for another example segment where one car occludes anoth
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-One obvious step to make my pipeline more robust is to perform better treatment of the training and test data when training the classifier. Having examples in the test set theat are so near those from the training set might prevent the classifier from generalizing. For the next iteration, I would definitely go through the training images and do some form of screening or hard negative mining.
+One next step to make my pipeline more robust is to perform better treatment of the training and test data when training the classifier. Having examples in the test set theat are so near those from the training set might prevent the classifier from generalizing. For the next iteration, I would definitely go through the training images and make sure the entire sequence is only included as training or test data, but not both.
+
+I noticed that my detector sometimes missed a car for one frame now and then.  Returning probabilities and setting my own threshold for returning a detection might allow the model to catch more of the positives (you definitely want to return a car if it's there) at the cost of increasing the false-positive rate, many of which can be filtered out if using a video stream.  I could also try increasing the number of windows (by reducing the stride/cells_per_step) to increase window overlap at the cost of computation time.
 
 One weakness of my current implementation is that it most definitely does not run in real-time.  For a real-time implementation, a different method such as semantic segmentaiton with FCNs or [YOLO](https://pjreddie.com/darknet/yolo/) might work better.
 
