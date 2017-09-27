@@ -14,22 +14,18 @@ The goals / steps of this project were to:
 
 [//]: # (Image References)
 
-[YCrCb_channels]: ./examples/YCrCb_channels.png " ""
-[HLS_channels]: ./examples/HLS_channels.png " "
-[RGB_channels]: ./examples/RGB_channels.png " "
-[num_orientations_2_4_8_12]: ./examples/num_orientations_2_4_8_12.png " "
-[pix_per_cell_4_8_16]: ./examples/pix_per_cell_4_8_16.JPG " "
-[hog_subsampling_detections_test4_allScales]: ./examples/hog_subsampling_detections_test4_allScales.JPG " "
-[multi_scale_raw_box_detections]: ./examples/multi_scale_raw_box_detections.png " "
-[final_detections_and_heatmaps]: ./examples/final_detections_and_heatmaps.jpg " "
-[boxesGIF]: ./examples/output1_boxes.gif "Sliding window detections on a short clip."
-[trackedJointGIF]: ./examples/output1_tracked_15_joint_w_time.gif "Polynomial fits to window boxes, lanes fit jointly so they have the same shape in the perspective transformed image."
-[trackedSepGIF]: ./examples/output1_tracked_15_sep_w_time.gif "Polynomial fits to window boxes, lanes fit independently so they can have different shapes in the perspective transformed image."
-[bouncingGIF]: ./examples/bouncing_example.gif "The perspective transform changes when the car bounces, making decreasing the fit quaility when fitting lines jointly."
-[finalResult]: ./examples/output1_tracked_long_15_joint_w_time.gif "Final result, lines fit jointly, allowing parameters to vary linearly over time, using the previous 15 frames of window locations for each frame."
+[YCrCb_channels]: ./examples/YCrCb_channels.png "HOG features for YCrCb channels 0-2 down from top"
+[HLS_channels]: ./examples/HLS_channels.png "HOG features for HLS channels 0-2 down from top"
+[RGB_channels]: ./examples/RGB_channels.png "HOG features for RGB channels 0-2 down from top"
+[num_orientations_2_4_8_12]: ./examples/num_orientations_2_4_8_12.png "Effect of number of gradient orientation bins (2, 4, 8, 12) down from top"
+[pix_per_cell_4_8_16]: ./examples/pix_per_cell_4_8_16.JPG "Effect of cell edge pixel length (4, 8, 16) down from top"
+[scaled_features_comparison_5066]: ./examples/scaled_features_comparison_5066.jpg "Features were scaled using StandardScaler.transform()"
+[hog_subsampling_detections_test4_allScales]: ./examples/hog_subsampling_detections_test4_allScales.JPG "Raw detections at three spatial scales"
+[multi_scale_raw_box_detections]: ./examples/multi_scale_raw_box_detections.png "More examples of raw detections"
+[raw_heatmap_detections_comparison_test1]: ./examples/raw_heatmap_detections_comparison_test1.png "The full pipeline all together"
+[final_detections_and_heatmaps]: ./examples/final_detections_and_heatmaps.jpg "Final output on more examples"
+[finalResult]: ./examples/output1_tracked_full.gif "Final result"
 [video1]: ./project_video_tracked.mp4 "Video"
-[challengeResult]: ./examples/challenge_tracked.gif "My pipeline didn't do as well on the challenge video!"
-
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -52,7 +48,7 @@ The goals / steps of this project were to:
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images (including which color space was chosen, which HOG parameters (orientations, pixels_per_cell, cells_per_block) and why.
 
-The code for this step is contained in lines # through # of the file `XXX.py`.  
+The code for this step is contained in lines XXX through XXX of the file `extract_features.py`.  
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  See below for an example of one of each of the `vehicle` and `non-vehicle` classes.
 
@@ -113,7 +109,9 @@ Interestingly, when I tried both of these classifiers on the test images and in 
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using a feature vector composed of HOG features, raw pixels, and a color histogram.  The HOG features were extracted from all three chanels of the image converted to `YCrCb` color space and were computed on an 8 pixel grid with 12 orientation bins.  I also included raw pixels of a 32 x 32 resized image using the `bin_spatial()` function provided in the lesson.  Finally, I added a feature that concatenated the intensity histogram of each color channel separately.  This gave 10176 features in total.
+I trained a linear SVM using a scaled feature vector composed of HOG features, raw pixels, and a color histogram.  The HOG features were extracted from all three chanels of the image converted to `YCrCb` color space and were computed on an 8 pixel grid with 12 orientation bins.  I also included raw pixels of a 32 x 32 resized image using the `bin_spatial()` function provided in the lesson.  Finally, I added a feature that concatenated the intensity histogram of each color channel separately.  This gave 10176 features in total.  Features were scaled using the `sklearn.preprocessing.StandardScaler.transform()` function (code lines 134-136 in extract_features.py).  An example of the effect of scaling is shown below:
+
+![alt text][scaled_features_comparison_5066]
 
 ### Sliding Window Search
 
@@ -127,7 +125,9 @@ I used the HOG subsampling approach in which HOG features are computed for the e
 
 The boxes at the smallest scale seemed to have a lot of false positives and took a long time to evaluate (because there were so many of them), so I decided to only keep the two larger search scales.
 
-Finally, I created a heatmap image, where each box classified as a car added a square of that size to the pixels of the heatmap image.  The heatmap thus accumulates the evidence from all the boxes together, and the result can be thresholded so that single detections are thrown out.  Then by using the `scipy.ndimage.measurements.label()` function, I extracted a bounding box for each separate blob in the heatmap.
+Finally, I created a heatmap image, where each box classified as a car added a square of that size to the pixels of the heatmap image.  The heatmap thus accumulates the evidence from all the boxes together, and the result can be thresholded so that single detections are thrown out.  Then by using the `scipy.ndimage.measurements.label()` function, I extracted a bounding box for each separate blob in the heatmap.  Here is an example of the entire pipeline together:
+
+![alt text][raw_heatmap_detections_comparison_test1]
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
