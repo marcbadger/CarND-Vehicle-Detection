@@ -20,7 +20,7 @@ The goals / steps of this project were to:
 [num_orientations_2_4_8_12]: ./examples/num_orientations_2_4_8_12.png "Effect of number of gradient orientation bins (2, 4, 8, 12) down from top"
 [pix_per_cell_4_8_16]: ./examples/pix_per_cell_4_8_16.JPG "Effect of cell edge pixel length (4, 8, 16) down from top"
 [scaled_features_comparison_5066]: ./examples/scaled_features_comparison_5066.jpg "Features were scaled using StandardScaler.transform()"
-[hog_subsampling_detections_test4_allScales]: ./examples/hog_subsampling_detections_test4_allScales.JPG "Raw detections at three spatial scales"
+[hog_subsampling_detections_test4_allScales]: ./examples/hog_subsampling_detections_test4_allScales.jpg "Raw detections at three spatial scales"
 [multi_scale_raw_box_detections]: ./examples/multi_scale_raw_box_detections.png "More examples of raw detections"
 [raw_heatmap_detections_comparison_test1]: ./examples/raw_heatmap_detections_comparison_test1.png "The full pipeline all together"
 [final_detections_and_heatmaps]: ./examples/final_detections_and_heatmaps.jpg "Final output on more examples"
