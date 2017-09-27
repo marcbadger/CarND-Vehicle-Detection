@@ -24,8 +24,8 @@ The goals / steps of this project were to:
 [multi_scale_raw_box_detections]: ./examples/multi_scale_raw_box_detections.png "More examples of raw detections"
 [raw_heatmap_detections_comparison_test1]: ./examples/raw_heatmap_detections_comparison_test1.png "The full pipeline all together"
 [final_detections_and_heatmaps]: ./examples/final_detections_and_heatmaps.jpg "Final output on more examples"
-[finalResult]: ./examples/output1_tracked_full.gif "Final result"
-[video1]: ./project_video_tracked.mp4 "Video"
+[output1_tracked_full]: ./examples/output1_tracked_full.gif "Final result"
+[project_video_tracked]: ./project_video_tracked.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -48,7 +48,7 @@ The goals / steps of this project were to:
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images (including which color space was chosen, which HOG parameters (orientations, pixels_per_cell, cells_per_block) and why.
 
-The code for this step is contained in lines XXX through XXX of the file `extract_features.py`.  
+The code for this step is contained in lines 62 through 134 of the file `extract_features.py` and `get_hog_features()` and `extract_features()` in `lesson_functions.py`.  
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  See below for an example of one of each of the `vehicle` and `non-vehicle` classes.
 
@@ -105,11 +105,11 @@ I tried various combinations of parameters (defaults: `color_space=YCrCb, orient
 
 Based on the above data, I chose to continue with the `HLS` color space with 12 bins, 8 pixels per cell, and one cell per block because it gave the best accuracy. Note that these accuracies are probably artificially high because images are taken from video sequences, but are randomly split into train and test sets.  This makes it very likely that any given test image is very similar to a training image.
 
-Interestingly, when I tried both of these classifiers on the test images and in the actual video pipeline, the `HLS` color space classifier definitely performed much worse and gave more false positives!
+Interestingly, when I tried both of these classifiers on the test images and in the actual video pipeline, the `HLS` color space classifier definitely performed much worse and gave more false positives!  For the video pipeline, I found that `color_space=YCrCb, orient=9, pix_per_cell=8, cell_per_block=2, hog_channel='ALL' or `color_space=YCrCb, orient=12, pix_per_cell=8, cell_per_block=2, hog_channel='ALL' worked best.
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using a scaled feature vector composed of HOG features, raw pixels, and a color histogram.  The HOG features were extracted from all three chanels of the image converted to `YCrCb` color space and were computed on an 8 pixel grid with 12 orientation bins.  I also included raw pixels of a 32 x 32 resized image using the `bin_spatial()` function provided in the lesson.  Finally, I added a feature that concatenated the intensity histogram of each color channel separately.  This gave 10176 features in total.  Features were scaled using the `sklearn.preprocessing.StandardScaler.transform()` function (code lines 134-136 in extract_features.py).  An example of the effect of scaling is shown below:
+I trained a linear SVM using a scaled feature vector composed of HOG features, raw pixels, and a color histogram.  The HOG features were extracted from all three chanels of the image converted to `YCrCb` color space and were computed on an 8 pixel grid with 12 orientation bins.  I also included raw pixels of a 32 x 32 resized image using the `bin_spatial()` function provided in the lesson.  Finally, I added a feature that concatenated the intensity histogram of each color channel separately.  This gave 10176 features in total.  Features were scaled using the `sklearn.preprocessing.StandardScaler.transform()` function (code lines 129-131 in extract_features.py).  An example of the effect of scaling is shown below:
 
 ![alt text][scaled_features_comparison_5066]
 
@@ -117,7 +117,7 @@ I trained a linear SVM using a scaled feature vector composed of HOG features, r
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I used the HOG subsampling approach in which HOG features are computed for the entire image and then subsampled.  With the reasoning that cars near farther away would be smaller and closer to the horizon, I initially searched over three regions and spatial scales.  I searched the lower half of the image at a scale of 1.5, a slightly smaller region starting halfway down the image at a scale of 1, and the third quarter of the image from the top at a scale of 0.5.  Detections at 1.5, 1, and 0.5 scales are shown in the blue, green, and red, respectively in the image below. 
+I used the HOG subsampling approach in which HOG features are computed for the entire image and then subsampled (`find_cars()` function in `hog_subsampling_w_heatmap.py`, lines 42-118).  With the reasoning that cars near farther away would be smaller and closer to the horizon, I initially searched over three regions and spatial scales.  I searched the lower half of the image at a scale of 1.5, a slightly smaller region starting halfway down the image at a scale of 1, and the third quarter of the image from the top at a scale of 0.5.  Detections at 1.5, 1, and 0.5 scales are shown in the blue, green, and red, respectively in the image below. 
 
 ![alt text][hog_subsampling_detections_test4_allScales]
 
@@ -125,7 +125,7 @@ I used the HOG subsampling approach in which HOG features are computed for the e
 
 The boxes at the smallest scale seemed to have a lot of false positives and took a long time to evaluate (because there were so many of them), so I decided to only keep the two larger search scales.
 
-Finally, I created a heatmap image, where each box classified as a car added a square of that size to the pixels of the heatmap image.  The heatmap thus accumulates the evidence from all the boxes together, and the result can be thresholded so that single detections are thrown out.  Then by using the `scipy.ndimage.measurements.label()` function, I extracted a bounding box for each separate blob in the heatmap.  Here is an example of the entire pipeline together:
+Finally, I created a heatmap image, where each box classified as a car added a square of that size to the pixels of the heatmap image (code lines 151-180 in `hog_subsampling_w_heatmap.py`).  The heatmap thus accumulates the evidence from all the boxes together, and the result can be thresholded so that single detections are thrown out.  Then by using the `scipy.ndimage.measurements.label()` function, I extracted a bounding box for each separate blob in the heatmap.  Here is an example of the entire pipeline together:
 
 ![alt text][raw_heatmap_detections_comparison_test1]
 
@@ -139,16 +139,18 @@ I settled on searching at two scales using YCrCb 3-channel HOG features plus spa
 ### Video Implementation
 
 ####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./project_video_tracked.mp4)
 
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-Overlapping bounding boxes were handled by the heatmap accumulation method described above.  This method gave a set of non-overlapping bounding boxes for each frame.  Nearby detections in subsequent frames are stored in a list of tracks, where each track has the form: `(status{"new","alive","almostdead","dead"}, numDetectionsInTrack, framesSinceLastSeen, (bbox_age_0, bbox_age_1, ...)`
+Overlapping bounding boxes were handled by the heatmap accumulation method described above.  This method gave a set of non-overlapping bounding boxes for each frame.  
 
-New bounding boxes from each frame are assigned to existing tracks according to the [Hungarian asisgnment algorithm](https://en.wikipedia.org/wiki/Hungarian_algorithm), which assigns tracks to new detections by minimizing a total cost computed from a cost matrix.  As implemented, the cost matrix is the distance between the center of the last assigned box of each track (rows of the cost matrix) and each new box (columns of the cost matrix).
+Frame-to-frame tracking was handled by the `Vehicles` class.  Nearby detections in subsequent frames are stored in a list of tracks, where each track has the form: `(status{"new","alive","almostdead","dead"}, numDetectionsInTrack, framesSinceLastSeen, (bbox_age_0, bbox_age_1, ...)`
 
-The basic algorighm run for each new frame is as follows:
+New bounding boxes from each frame are assigned to existing tracks according to the [Hungarian asisgnment algorithm](https://en.wikipedia.org/wiki/Hungarian_algorithm), which assigns tracks to new detections by minimizing a total cost computed from a cost matrix (code lines 57-93 in `vehicles.py`).  As implemented, the cost matrix is the distance between the center of the last assigned box of each track (rows of the cost matrix) and each new box (columns of the cost matrix).
+
+The basic algorighm run for each new frame is as follows (code lines 96-142 in `vehicles.py`):
 1. Delete tracks labeled "dead" from the track list
 2. Compute the cost matrix for each remaining track and each new detection
 3. If a track was assigned a new box and the new box is within a distance threshold:
@@ -164,10 +166,9 @@ The basic algorighm run for each new frame is as follows:
 	a) assign it to a new track, of type "new", meaning it won't be drawn until it gets assigned a few more detections.
 6. Return the most recent bounding box for each track
 
-Here's an example of the track history for each car, you can see track assignment is consistent.
+Here is a gif of the final output of the tracking pipeline:
 
-And here are the tracks for another example segment where one car occludes another:
-
+![alt text][output1_tracked_full]
 
 ---
 
