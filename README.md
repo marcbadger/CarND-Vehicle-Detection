@@ -19,6 +19,8 @@ The goals / steps of this project were to:
 [RGB_channels]: ./examples/RGB_channels.png "HOG features for RGB channels 0-2 down from top"
 [num_orientations_2_4_8_12]: ./examples/num_orientations_2_4_8_12.png "Effect of number of gradient orientation bins (2, 4, 8, 12) down from top"
 [pix_per_cell_4_8_16]: ./examples/pix_per_cell_4_8_16.png "Effect of cell edge pixel length (4, 8, 16) down from top"
+[output1_tracked_HLS_12_8_1_ALL]: ./examples/output1_tracked_HLS_12_8_1_ALL.gif "In contrast to its accuracy on the test set using images, the performance of HLS on real video was not great"
+[output1_tracked_YCrCb_12_8_1_ALL]: ./examples/output1_tracked_YCrCb_12_8_1_ALL.gif "Features were scaled using StandardScaler.transform()"
 [scaled_features_comparison_5066]: ./examples/scaled_features_comparison_5066.jpg "Features were scaled using StandardScaler.transform()"
 [hog_subsampling_detections_test4_allScales]: ./examples/hog_subsampling_detections_test4_allScales.jpg "Raw detections at three spatial scales"
 [multi_scale_raw_box_detections]: ./examples/multi_scale_raw_box_detections.png "More examples of raw detections"
@@ -106,6 +108,14 @@ I tried various combinations of parameters (defaults: `color_space=YCrCb, orient
 Based on the above data, I chose to continue with the `HLS` color space with 12 bins, 8 pixels per cell, and one cell per block because it gave the best accuracy. Note that these accuracies are probably artificially high because images are taken from video sequences, but are randomly split into train and test sets.  This makes it very likely that any given test image is very similar to a training image.
 
 Interestingly, when I tried both of these classifiers on the test images and in the actual video pipeline, the `HLS` color space classifier definitely performed much worse and gave more false positives!  For the video pipeline, I found that `color_space=YCrCb, orient=9, pix_per_cell=8, cell_per_block=2, hog_channel='ALL' or `color_space=YCrCb, orient=12, pix_per_cell=8, cell_per_block=2, hog_channel='ALL' worked best.
+
+Here is a short clip using the `HLS` color space. In contrast to its accuracy on the test set using images, the performance of HLS on real video was not great:
+
+![alt text][output1_tracked_HLS_12_8_1_ALL]
+
+and here is one using the `YCrCb` color space, which performed better:
+
+![alt text][output1_tracked_YCrCb_12_8_2_ALL]
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
