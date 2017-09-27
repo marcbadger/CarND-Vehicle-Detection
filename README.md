@@ -22,8 +22,8 @@ The goals / steps of this project were to:
 [scaled_features_comparison_5066]: ./examples/scaled_features_comparison_5066.jpg "Features were scaled using StandardScaler.transform()"
 [hog_subsampling_detections_test4_allScales]: ./examples/hog_subsampling_detections_test4_allScales.jpg "Raw detections at three spatial scales"
 [multi_scale_raw_box_detections]: ./examples/multi_scale_raw_box_detections.png "More examples of raw detections"
-[raw_heatmap_detections_comparison_test1]: ./examples/raw_heatmap_detections_comparison_test1.png "The full pipeline all together"
-[final_detections_and_heatmaps]: ./examples/final_detections_and_heatmaps.jpg "Final output on more examples"
+[raw_heatmap_detections_comparison_test1]: ./examples/raw_heatmap_detections_comparison_test1.jpg "The full pipeline all together"
+[final_detections_and_heatmaps]: ./examples/final_detections_and_heatmaps.png "Final output on more examples"
 [output1_tracked_full]: ./examples/output1_tracked_full.gif "Final result"
 [project_video_tracked]: ./project_video_tracked.mp4 "Video"
 
@@ -134,6 +134,7 @@ Finally, I created a heatmap image, where each box classified as a car added a s
 I settled on searching at two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector.  The only "false-positive" was a detection in a shadow near the barrier in one image (but in fact, if you watch the video of that section, there's actually a car on the other side of the barrier there).  Here are some example images of heatmaps on the right and the corresponding 	`label()` blob detections:
 
 ![alt text][final_detections_and_heatmaps]
+
 ---
 
 ### Video Implementation
