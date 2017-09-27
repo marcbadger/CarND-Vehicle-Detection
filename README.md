@@ -20,7 +20,7 @@ The goals / steps of this project were to:
 [num_orientations_2_4_8_12]: ./examples/num_orientations_2_4_8_12.png "Effect of number of gradient orientation bins (2, 4, 8, 12) down from top"
 [pix_per_cell_4_8_16]: ./examples/pix_per_cell_4_8_16.png "Effect of cell edge pixel length (4, 8, 16) down from top"
 [output1_tracked_HLS_12_8_1_ALL]: ./examples/output1_tracked_HLS_12_8_1_ALL.gif "In contrast to its accuracy on the test set using images, the performance of HLS on real video was not great"
-[output1_tracked_YCrCb_12_8_1_ALL]: ./examples/output1_tracked_YCrCb_12_8_1_ALL.gif "Features were scaled using StandardScaler.transform()"
+[output1_tracked_YCrCb_12_8_2_ALL]: ./examples/output1_tracked_YCrCb_12_8_2_ALL.gif "Features were scaled using StandardScaler.transform()"
 [scaled_features_comparison_5066]: ./examples/scaled_features_comparison_5066.jpg "Features were scaled using StandardScaler.transform()"
 [hog_subsampling_detections_test4_allScales]: ./examples/hog_subsampling_detections_test4_allScales.jpg "Raw detections at three spatial scales"
 [multi_scale_raw_box_detections]: ./examples/multi_scale_raw_box_detections.png "More examples of raw detections"
