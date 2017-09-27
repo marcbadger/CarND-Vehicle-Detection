@@ -159,7 +159,7 @@ Overlapping bounding boxes were handled by the heatmap accumulation method descr
 
 Frame-to-frame tracking was handled by the `Vehicles` class.  Nearby detections in subsequent frames are stored in a list of tracks, where each track has the form: `(status{"new","alive","almostdead","dead"}, numDetectionsInTrack, framesSinceLastSeen, (bbox_age_0, bbox_age_1, ...)`
 
-New bounding boxes from each frame are assigned to existing tracks according to the [Hungarian asisgnment algorithm](https://en.wikipedia.org/wiki/Hungarian_algorithm), which assigns tracks to new detections by minimizing a total cost computed from a cost matrix (code lines 57-93 in `vehicles.py`).  As implemented, the cost matrix is the distance between the center of the last assigned box of each track (rows of the cost matrix) and each new box (columns of the cost matrix).
+New bounding boxes from each frame are assigned to existing tracks according to the [Hungarian asisgnment algorithm](https://en.wikipedia.org/wiki/Hungarian_algorithm), which assigns tracks to new detections by minimizing a total cost computed from a cost matrix (code lines 57-93 in `vehicles.py`).  As implemented, the cost matrix is the distance between the center of the last assigned box of each track (rows of the cost matrix) and each new box (columns of the cost matrix).  [In retrospect, I should have also incorporated a distance in feature space to preven nearby tracks from "switching" just because they're nearby each other.  This is the cause of the dropped detections you can see around frame 650 in the tracked video.]
 
 The basic algorighm run for each new frame is as follows (code lines 96-142 in `vehicles.py`):
 1. Delete tracks labeled "dead" from the track list
