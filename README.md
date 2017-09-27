@@ -14,7 +14,7 @@ The goals / steps of this project were to:
 
 [//]: # (Image References)
 
-[YCrCb_channels]: ./examples/YCrCb_channels.png "HOG features for YCrCb channels 0-2 down from top"
+[YCrCb_channels]: ./examples/YcrCb_channels.png "HOG features for YCrCb channels 0-2 down from top"
 [HLS_channels]: ./examples/HLS_channels.png "HOG features for HLS channels 0-2 down from top"
 [RGB_channels]: ./examples/RGB_channels.png "HOG features for RGB channels 0-2 down from top"
 [num_orientations_2_4_8_12]: ./examples/num_orientations_2_4_8_12.png "Effect of number of gradient orientation bins (2, 4, 8, 12) down from top"
