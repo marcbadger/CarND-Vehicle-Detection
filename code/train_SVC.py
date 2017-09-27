@@ -23,6 +23,7 @@ feature_options = os.listdir(basedir)
 
 directoryName = feature_options[0]
 
+# PICK ONE OF THESE TO USE AS FEATURES FOR THE CLASSIFIER:
 #directoryName = 'features_YCrCb_9_8_2_ALL_32_16_True_True_True'
 #directoryName = 'features_HLS_9_8_2_ALL_32_16_True_True_True'
 #directoryName = 'features_RGB_9_8_2_ALL_32_16_True_True_True'
@@ -32,20 +33,6 @@ directoryName = 'features_YCrCb_12_8_2_ALL_32_16_True_True_True'
 #directoryName = 'features_YCrCb_9_8_1_ALL_32_16_True_True_True'
 #directoryName = 'features_YCrCb_9_8_2_0_32_16_True_True_True'
 #directoryName = 'features_HLS_12_8_1_ALL_32_16_True_True_True'
-
-# splits = directoryName.split("_")
-
-# print(splits)
-
-# # Set the feature hyperparameters according to the way they were saved
-# color_space = splits[1] # ALSO USED 'YCrCb'
-# orient = int(splits[2]) # HOG orientations
-# pix_per_cell = int(splits[3]) # HOG pixels per cell
-# cell_per_block = int(splits[4]) # HOG cells per block
-# hog_channel = splits[5] # Can be 0, 1, 2, or "ALL". 'ALL' works best when actually extracting features, but can't be used with vis=True
-# spatial_size = (int(splits[6]),int(splits[6])) #(16,16) # Spatial binning dimensions
-# hist_bins = int(splits[7]) #32 # Number of histogram bins
-# spatial_feat, hist_feat, hog_feat = [True for x in splits if x == 'True'] # Return spatial features
 
 # load feature parameters from a pickle
 dist_pickle = pickle.load( open(basedir + '/' + directoryName + "/feature_params.p", "rb" ) )

@@ -16,6 +16,7 @@ from scipy.ndimage.measurements import label
 basedir = 'E:/Self_Driving_Cars/CarND-Vehicle-Detection/features'
 feature_options = os.listdir(basedir)
 
+# PICK A CLASSIFIER TO USE:
 #directoryName = feature_options[0]
 directoryName = 'features_YCrCb_8_8_2_ALL_32_16_True_True_True'
 
@@ -122,7 +123,7 @@ def find_cars(img, ystart, ystop, scale, cells_per_step, svc, X_scaler, orient, 
 # MULTIPLE DETECTIONS AND FALSE POSITIVES
 ################################
 
-# Search for cars at three spatial scales over three regions of the image
+# Search for cars at two-three spatial scales over three regions of the image
 # ystarts = [400, 400, 400]
 # ystops = [656, 528, 464]
 # scales = [1.5, 1, 0.5]
@@ -213,60 +214,3 @@ for idx, fname in enumerate(images):
     write_name = 'C:/Users/marcbadger.MBCOMP/Google Drive/Self_Driving_Cars/CarND-Vehicle-Detection-master/output_images' +'/hog_subsampling_refined_heatmap_' + filename[:-4] +'.jpg'
     plt.savefig(write_name, bbox_inches='tight')
     plt.close()
-
-
-# Initially, assign tracks just based on location alone:
-# 1. implement cost matrix
-# 2. implement hungarian algorithm
-
-# FROM: https://stackoverflow.com/questions/32046582/spline-with-constraints-at-border
-
-import numpy as np
-from scipy.interpolate import UnivariateSpline, splev, splrep
-from scipy.optimize import minimize
-
-def guess(x, y, k, s, w=None):
-    """Do an ordinary spline fit to provide knots"""
-    return splrep(x, y, w, k=k, s=s)
-
-def err(c, x, y, t, k, w=None):
-    """The error function to minimize"""
-    diff = y - splev(x, (t, c, k))
-    if w is None:
-        diff = np.einsum('...i,...i', diff, diff)
-    else:
-        diff = np.dot(diff*diff, w)
-    return np.abs(diff)
-
-def spline_neumann(x, y, k=3, s=0, w=None):
-    t, c0, k = guess(x, y, k, s, w=w)
-    x0 = x[0] # point at which zero slope is required
-    con = {'type': 'eq',
-           'fun': lambda c: splev(x0, (t, c, k), der=1),
-           #'jac': lambda c: splev(x0, (t, c, k), der=2) # doesn't help, dunno why
-           }
-    opt = minimize(err, c0, (x, y, t, k, w), constraints=con)
-    copt = opt.x
-    return UnivariateSpline._from_tck((t, copt, k))
-
-import matplotlib.pyplot as plt
-
-n = 10
-x = np.linspace(0, 2*np.pi, n)
-y0 = np.cos(x) # zero initial slope
-std = 0.5
-noise = np.random.normal(0, std, len(x))
-y = y0 + noise
-k = 3
-
-sp0 = UnivariateSpline(x, y, k=k, s=n*std)
-sp = spline_neumann(x, y, k, s=n*std)
-
-plt.figure()
-X = np.linspace(x.min(), x.max(), len(x)*10)
-plt.plot(X, sp0(X), '-r', lw=1, label='guess')
-plt.plot(X, sp(X), '-r', lw=2, label='spline')
-plt.plot(X, sp.derivative()(X), '-g', label='slope')
-plt.plot(x, y, 'ok', label='data')
-plt.legend(loc='best')
-plt.show()
